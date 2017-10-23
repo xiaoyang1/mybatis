@@ -34,6 +34,10 @@
           <!-- 路径用 斜线（/） 分割，而不是用 点(.) -->
 
           <mapper resource="CRUDMapper.xml"></mapper>
+          <mapper resource="UserMapper.xml"></mapper>
+          <mapper resource="ClassMapper.xml"></mapper>
+          <mapper resource="One2More.xml"></mapper>
+          <mapper resource="DynamicSearch.xml"></mapper>
           <mapper class="com.testCRUD.UserMapper"></mapper>
       </mappers>
  </configuration>

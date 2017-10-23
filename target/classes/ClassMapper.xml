@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="ClassMapper">
+    <!--
+    根据班级id查询班级信息（带老师的信息）
+    ##1.连表查询
+    select * from class c,teacher t  where c.teacher_id = t.t_id and c.c_id=1
+    ##2 执行两次查询
+    select * from class where c_id = 2
+    select * from teacher where t_id=1
+    -->
+
+    <!--   方式一：嵌套结果，使用嵌套结果映射来处理重复的联合结果的子集
+           封装联表查询的数据（取出重复的数据）由于封装复杂，不能再用resultType
+             select * from class c,teacher t  where c.teacher_id = t.t_id and c.c_id=1
+             resultMap 中的type是要返回的对象。
+    -->
+    <select id="getClass" parameterType="int" resultMap="getClassMap">
+        select * from class c,teacher t  where c.teacher_id=t.t_id and c.c_id=#{id}
+    </select>
+    <resultMap id="getClassMap" type="Classes">
+        <id property="id" column="c_id"/>   <!-- id专门是做主键的，property是类属性名，column是表字段 -->
+        <result property="name" column="c_name"/>
+        <!--由于teacher是一个对象，所以上述两种都不行，只能用association-->
+        <association property="teacher" javaType="Teacher">
+            <id property="id" column="t_id"/>
+            <result property="name" column="t_name"/>
+        </association>
+    </resultMap>
+
+    <!--##2 执行两次查询-->
+    <!--select * from class where c_id = 2-->
+    <!--select * from teacher where t_id=1-->
+    <select id="getClass2" parameterType="int" resultMap="getClass2Map">
+        select * from class where c_id=#{id}
+    </select>
+    <select id="getTeacher" parameterType="int" resultType="Teacher">
+        <!--由于这里的字段名和实体类的属性名不一样，所以必须用别名解决，否则的话就要多一个resultMap-->
+        select t_id id,t_name name from teacher where t_id=#{id}
+    </select>
+    <resultMap id="getClass2Map" type="Classes">
+        <id property="id" column="c_id"/>   <!-- id专门是做主键的，property是类属性名，column是表字段 -->
+        <result property="name" column="c_name"/>
+        <association property="teacher"  column="teacher_id" select="getTeacher">
+            <!--关键是teacherid的数据怎么传呢？-->
+            <!--上面的id是通过column这个对象来传的。就是column字段的值传给下一个select-->
+        </association>
+    </resultMap>
+
+</mapper>

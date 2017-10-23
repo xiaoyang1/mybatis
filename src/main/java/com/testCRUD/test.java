@@ -1,6 +1,8 @@
 package com.testCRUD;
 
 
+import com.test1.Classes;
+import com.test1.ConditionUser;
 import com.test1.Users;
 import com.util.MyBatisUtil;
 import org.apache.ibatis.annotations.Mapper;
@@ -10,7 +12,9 @@ import org.junit.Test;
 
 import java.io.IOException;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class test {
     private  static  SqlSessionFactory factory= null;
@@ -85,4 +89,48 @@ public class test {
         session.close();
     }
 
+    @Test  //一对一关联表查询 嵌套结果
+    public void testOne2One(){
+        String statement = "ClassMapper.getClass";
+        Classes classes=session.selectOne(statement,2);
+        System.out.println(classes);
+        session.close();
+    }
+    @Test  //一对一关联表查询 嵌套结果
+    public void testOne2One2(){
+        String statement = "ClassMapper.getClass2";
+        Classes classes=session.selectOne(statement,3);
+        System.out.println(classes);
+        session.close();
+    }
+
+    @Test  //一对一关联表查询 嵌套结果
+    public void testOne2More(){
+        //String statement = "One2MoreMapper.getClass";
+        String statement ="One2MoreMapper.getClass2";
+        Classes classes=session.selectOne(statement,2);
+        System.out.println(classes);
+        session.close();
+    }
+
+    @Test
+    public  void testDynamicSearch(){
+        String statement ="DynamicMapper.getUser";
+        String name ="j";
+        ConditionUser parameter=new ConditionUser("%"+name+"%",13,18);
+        List<Users> list=session.selectList(statement,parameter);
+        System.out.println(list);
+
+        session.close();
+    }
+    @Test
+    public void testStoreProc(){
+        String statement ="UserMapper.getUserCount";
+        Map<String,Integer> parameterMap=new HashMap<String, Integer>();
+        parameterMap.put("sexid",0);
+        parameterMap.put("usercount",-1);
+        session.selectOne(statement,parameterMap);
+        int result=parameterMap.get("usercount");
+        System.out.println(result);
+    }
 }
